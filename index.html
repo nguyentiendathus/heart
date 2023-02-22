@@ -22,7 +22,7 @@
         position:fixed;
         width:100%;
         text-align: center;
-        font-size: 30pt;
+        font-size: 8pt;
         color: #999;
         opacity: 0.5;
         bottom: 24px;
@@ -34,7 +34,7 @@
 <script src="https://cdn.jsdelivr.net/npm/three@0.100.0/examples/js/controls/OrbitControls.js"></script>
 
 <div class="footer">
-    For Trâm Anh :)))
+    P. Tran
 </div>
 <script>
     const scene = new THREE.Scene();
@@ -56,7 +56,7 @@
     const xSize = 50;
     const ySize = 50;
     const zSize = 50;
-    const density = 2;
+    const density = 3;
     const nParticles = xSize * ySize * zSize * density;
     
     const positions = [];
@@ -97,30 +97,28 @@
        
             void main(){
                 vec3 pos = position;
+                pos.y = mod(pos.y + speed * time, 100.) - 50.;
                 
+    
                 vec3 h = pos / 2.5;
                 h.y = 4. + 1.2 * h.y - abs(h.x) * sqrt(max((20. - abs(h.x)) / 15., 0.));
                 h.z = h.z * (2. - h.y / 15.);
                 float pLimit = 0.675;
                 float nLimit = -pLimit;
                 float nullPoint = 0.5;
-                float scaledT = time * 1.25;
+                float scaledT = time * 1.3;
                 float dt = scaledT - pLimit * ( 2. * floor( scaledT / (pLimit* 2.)) + 1.);
-                float r = 15. + 1.2 * pow(sin(2. * PI * dt), 4.);
+                float r = 15. + pow(sin(2. * PI * dt), 4.);
                 if (dt < -nullPoint || dt > nullPoint) {
                     r = 15.;
                 }
-                float dDyn = length(h) - r;  
-                float dConst = length(h) - 15.;      
-                
+                float dCell = length(h) - r;        
                 vec3 c = vec3(247. / 255., 89. / 255., 183. / 255.);        
-                if (dDyn > -1.) c = vec3(245. / 255., 100. / 255., 186. / 255.);
+                if (dCell > -0.1) c = vec3(245. / 255., 100. / 255., 186. / 255.);
                 vC = c;
-                pos = pos - pos / length(pos) * (dDyn) * 2.5;
 
                 vec3 vPos = pos;
-                vDiscard = dConst > 0. || dConst < -1.0 ? 1. : 0.;
-
+                vDiscard = dCell > 0. || dCell < -1.0 ? 1. : 0.;
                 vec4 mvPosition = modelViewMatrix * vec4( pos, 1.0 );
                 gl_PointSize = sqrt(length(pos)/30.) * size * ( 300.0 / -mvPosition.z ) * ratio;
                 gl_Position = projectionMatrix * mvPosition;
